@@ -1,0 +1,12 @@
+--- 
+description: "Sample Heat Template to deploy an instance"
+heat_template_version: 2014-10-16
+resources: 
+  my_instance: 
+    properties: 
+      flavor: Test-Flavor
+      image: Rhel6.6
+      key_name: 17-dec-latest-key
+      networks: 
+        - network: public_network
+    type: "OS::Nova::Server"
