@@ -1,0 +1,49 @@
+---
+
+heat_template_version: 2014-10-16
+
+description: Simple template to deploy a single compute instance
+
+parameters:
+  image:
+    type: string
+    label: Image name or ID
+    description: Image to be used for compute instance
+    default: Centos6.6
+  flavor:
+    type: string
+    label: Flavor
+    description: Type of instance (flavor) to be used
+    default: Test-Flavor
+  key:
+    type: string
+    label: Key name
+    description: Name of key-pair to be used for compute instance
+    default: 17-dec-latest-key
+  private_network:
+    type: string
+    label: Private network name or ID
+    description: Network to attach instance to.
+    default: public_network
+
+resources:
+  my_instance:
+    type: OS::Nova::Server
+    properties:
+      image: { get_param: image }
+      flavor: { get_param: flavor }
+      key_name: { get_param: key }
+      networks:
+        - network: { get_param: private_network }
+  my_volume:
+    type: OS::Cinder::Volume
+    properties:
+      description: Sample Volume to be attached to the instance
+      name: Test-23mar-volume
+      size: 10
+      volume_type: raid5-block
+
+outputs:
+  instance_ip:
+    description: IP address of the instance
+    value: { get_attr: [my_instance, first_address] }
