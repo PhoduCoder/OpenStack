@@ -1,0 +1,50 @@
+--- 
+heat_template_version: 2014-10-16
+description: "A sample heat template to create an instance and attach a volume of  specified size to the instance\n"
+parameters: 
+  flavor: 
+    default: 1vCPU-2GB-RAM-20GB-Internal-Storage-INR-1
+    description: "The flavor to use to launch the instance"
+    label: Flavor
+    type: string
+  image: 
+    default: Rhel7-Latest-SELinuxDisabled
+    description: "The image used to boot up instance"
+    label: Image
+    type: string
+  key: 
+    default: 17-dec-latest-key
+    description: "The key used to login to the instance"
+    label: "Key Name"
+    type: string
+  private_network: 
+    default: public_network
+    description: "The network that you want your instance to be associated to"
+    label: Network
+    type: string
+resources: 
+  april7_instance: 
+    properties: 
+      flavor: {get_param: flavor}
+      image: {get_param: image}
+      key_name: {get_param: key}
+      networks: 
+        - network: {get_param: private_network}
+    type: "OS::Nova::Server"
+
+  april7_volume: 
+    type: "OS::Cinder::Volume"
+    properties:
+      name: 17April-Volume
+      volume_type: raid5-block
+      description: Sample Volume to be attached to the instance
+      size: 30
+
+  vol_attach: 
+    properties: 
+      instance_uuid: 
+        get_resource: april7_instance
+      mountpoint: /dev/vdb
+      volume_id: 
+        get_resource: april7_volume
+    type: "OS::Cinder::VolumeAttachment"
